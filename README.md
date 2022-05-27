@@ -1,2 +1,2 @@
 # exact-decimals
-a python implementation of floats that is exact (0.1 * 3 = 0.3 in my implementation, which isn't the case with regular floats)
+a python implementation of floats that is exact (0.1 * 3 = 0.3 in my implementation, which isn't the case with regular floats), but is unfortunately way more memory demanding than regular floats
