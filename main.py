@@ -2,6 +2,8 @@ class decimal:
     
     def __init__(self, value = 0, decimal = "0", precision: int = 0):
         """precision can be manually defined if needed, but will automatically be if not"""
+        self.__cut = not bool(precision) #définis la variable qui tronquera le résultat si nécéssaire
+        
         if (len(str(decimal)) > precision) and not precision and (type(value) != float): #définis la précision si non précisée
             precision = len(str(decimal))
 
@@ -28,6 +30,11 @@ class decimal:
                 self.decimal = self.decimal[:-1]
     
     def __str__(self):
+        if self.__cut: #enlève les 0 inutiles
+            while (self.precision >= 2) and (not int(self.decimal[-1])):
+                self.decimal = pop_last_str(self.decimal)[1]
+                self.precision -= 1
+        
         return f"{self.value}.{self.decimal}"
 
     def __add__(self, other):
@@ -113,6 +120,9 @@ class decimal:
         if type(other) == float:
             return self * decimal(other)
 
+        else:
+            raise TypeError(f"wrong type, only variables of type decimal, int, and floats are supported, but type {type(other)} was input")
+
 def pop_first_str(string: str):
     temp = ""
     for i in range(1, len(string)):
@@ -123,4 +133,4 @@ def pop_last_str(string: str):
     temp = pop_first_str(string[::-1])
     return temp[0], temp[1][::-1]
  
-print(decimal(4,76) * decimal(9,2))
+print(decimal(5,"0200"))
