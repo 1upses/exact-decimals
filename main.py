@@ -7,7 +7,8 @@ class decimal:
 
         if type(value) == float: #gestion des nombres flottants
             self.value = int(value)
-            self.decimal = str(value - int(value))[2:]
+            strip = 2 if value >= 0 else 3 #on retire le moins si c'est négatif
+            self.decimal = str(value - int(value))[strip:]
             if (len(self.decimal) > precision) and not precision:
                 precision = len(self.decimal)
             self.precision = precision
@@ -30,8 +31,6 @@ class decimal:
         return f"{self.value}.{self.decimal}"
 
     def __add__(self, other):
-        """adding negative numbers may lead to some strange behaviors (bugs I'm too lazy to fix),
-        I advise you to use the substracting operator instead"""
         if type(other) == decimal:
             
             while len(self.decimal) != len(other.decimal): #set la même précision pour chaque nombre
@@ -81,7 +80,9 @@ class decimal:
 
     def __mul__(self, other):
         if type(other) == int:
-            
+            #on multiplie d'abord les entiers, puis les parties décimales
+            #entre elles comme si c'était des entier, et on rajoute les
+            #caractères en trop à la partie entière
             value = self.value * other
             decim = str(int(self.decimal) * other)
 
@@ -94,10 +95,32 @@ class decimal:
 
             return decimal(value, decim, self.precision)
 
+        if type(other) == decimal:
+            #on supprime la virgule, on multiplie les 2 nombres
+            #ensemble comme pour des entiers, puis on replace la
+            #virgule selon le nombre de chiffres décimales des deux nombres
+            premier = int(str(self.value) + self.decimal)
+            dernier = int(str(other.value) + other.decimal)
+            space = len(self.decimal) + len(other.decimal)
+            resultat = str(premier * dernier)
+            to_add = ""
+            for _ in range(space):
+                temp = pop_last_str(resultat)
+                to_add = temp[0] + to_add
+                resultat = temp[1]
+            return decimal(int(resultat), to_add)
+
+        if type(other) == float:
+            return self * decimal(other)
+
 def pop_first_str(string: str):
     temp = ""
     for i in range(1, len(string)):
         temp += string[i]
     return (string[0], temp)
 
-print(decimal(4,25) * -5)
+def pop_last_str(string: str):
+    temp = pop_first_str(string[::-1])
+    return temp[0], temp[1][::-1]
+ 
+print(decimal(4,76) * decimal(9,2))
