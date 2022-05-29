@@ -37,6 +37,9 @@ class decimal:
         
         return f"{self.value}.{self.decimal}"
 
+    def to_float(self):
+        return float(str(self))
+    
     def __add__(self, other):
         if type(other) == decimal:
             
@@ -110,11 +113,14 @@ class decimal:
             dernier = int(str(other.value) + other.decimal)
             space = len(self.decimal) + len(other.decimal)
             resultat = str(premier * dernier)
+
             to_add = ""
             for _ in range(space):
                 temp = pop_last_str(resultat)
                 to_add = temp[0] + to_add
                 resultat = temp[1]
+                if len(resultat) == 1: ##on place des 0 au début du string pour éviter un out of range
+                    resultat = "0" + resultat
             return decimal(int(resultat), to_add)
 
         if type(other) == float:
@@ -133,4 +139,7 @@ def pop_last_str(string: str):
     temp = pop_first_str(string[::-1])
     return temp[0], temp[1][::-1]
  
-print(decimal(5,"0200"))
+a = decimal(0,1) * decimal(3,0)
+print(a, type(a))
+a = a.to_float()
+print(a, type(a))
