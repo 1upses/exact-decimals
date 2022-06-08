@@ -1,3 +1,6 @@
+from cv2 import divide
+
+
 class decimal:
     
     def __init__(self, value = 0, decimal = "0", precision: int = 0):
@@ -40,15 +43,18 @@ class decimal:
     def to_float(self):
         return float(str(self))
     
+    def to_int(self):
+        return int(self.to_float())
+
     def __add__(self, other):
         if type(other) == decimal:
             
             while len(self.decimal) != len(other.decimal): #set la même précision pour chaque nombre
-                if self.decimal > other.decimal:
+                if len(self.decimal) > len(other.decimal):
                     other.decimal += "0"
                     other.precision += 1
                     precision = other.precision
-                elif self.decimal < other.decimal:
+                elif len(self.decimal) < len(other.decimal):
                     self.decimal += "0"
                     self.precision += 1
                     precision = self.precision
@@ -90,20 +96,25 @@ class decimal:
 
     def __mul__(self, other):
         if type(other) == int:
-            #on multiplie d'abord les entiers, puis les parties décimales
-            #entre elles comme si c'était des entier, et on rajoute les
-            #caractères en trop à la partie entière
-            value = self.value * other
-            decim = str(int(self.decimal) * other)
+            # on multiplie d'abord les entiers, puis les parties décimales
+            # entre elles comme si c'était des entier, et on rajoute les
+            # caractères en trop à la partie entière
+            
+            #ne fonctionne pas bien
 
-            to_add = ""
-            while len(decim) != len(self.decimal):
-                temp = pop_first_str(decim)
-                to_add += temp[0]
-                decim = temp[1]
-            value += int(to_add)
+            # value = self.value * other
+            # decim = str(int(self.decimal) * other)
 
-            return decimal(value, decim, self.precision)
+            # to_add = ""
+            # while len(decim) != len(self.decimal):
+            #     temp = pop_first_str(decim)
+            #     to_add += temp[0]
+            #     decim = temp[1]
+            # value += int(to_add)
+
+            # return decimal(value, decim, self.precision)
+
+            return self * decimal(other)
 
         if type(other) == decimal:
             #on supprime la virgule, on multiplie les 2 nombres
@@ -129,6 +140,27 @@ class decimal:
         else:
             raise TypeError(f"wrong type, only variables of type decimal, int, and floats are supported, but type {type(other)} was input")
 
+    def __truediv__(self, other):
+        if type(other) == decimal:
+            diviseur = str(other.value) + other.decimal
+            dividende = str(self.value) + self.decimal
+            quotient = reste = ""
+            s = 0 #pour savoir où la virgule sera
+            for i in range(len(self.decimal)):
+                if not int(self.decimal[i]):
+                    s += 1
+                else:
+                    break
+            virgule = len(str(self.value) + s)
+            espace = 1
+            while not int(portion_l(diviseur, espace)) // int(dividende):
+                espace += 1
+                if espace - 1 == len(diviseur):
+                    diviseur += "0"
+            quotient += str(int(portion_l(diviseur, espace)) // int(dividende))
+            reste = dividende * quotient 
+
+
 def pop_first_str(string: str):
     temp = ""
     for i in range(1, len(string)):
@@ -138,8 +170,13 @@ def pop_first_str(string: str):
 def pop_last_str(string: str):
     temp = pop_first_str(string[::-1])
     return temp[0], temp[1][::-1]
- 
-a = decimal(0,1) * decimal(3,0)
-print(a, type(a))
-a = a.to_float()
-print(a, type(a))
+
+def portion_l(string: str, n: int) -> str:
+    s = ""
+    for _ in range(n):
+        temp = pop_first_str(string)
+        s += temp[0]
+        string = temp[1]
+    return s
+
+print(decimal(2,4) / decimal(1,36))
