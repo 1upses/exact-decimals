@@ -119,7 +119,7 @@ class decimal:
         if type(other) == decimal:
             #on supprime la virgule, on multiplie les 2 nombres
             #ensemble comme pour des entiers, puis on replace la
-            #virgule selon le nombre de chiffres décimales des deux nombres
+            #virgule selon le nombre de chiffres décimaux des deux nombres
             premier = int(str(self.value) + self.decimal)
             dernier = int(str(other.value) + other.decimal)
             space = len(self.decimal) + len(other.decimal)
@@ -130,7 +130,7 @@ class decimal:
                 temp = pop_last_str(resultat)
                 to_add = temp[0] + to_add
                 resultat = temp[1]
-                if len(resultat) == 1: ##on place des 0 au début du string pour éviter un out of range
+                if len(resultat) == 1: #on place des 0 au début du string pour éviter un out of range
                     resultat = "0" + resultat
             return decimal(int(resultat), to_add)
 
@@ -141,24 +141,37 @@ class decimal:
             raise TypeError(f"wrong type, only variables of type decimal, int, and floats are supported, but type {type(other)} was input")
 
     def __truediv__(self, other):
-        if type(other) == decimal:
-            diviseur = str(other.value) + other.decimal
-            dividende = str(self.value) + self.decimal
-            quotient = reste = ""
-            s = 0 #pour savoir où la virgule sera
-            for i in range(len(self.decimal)):
-                if not int(self.decimal[i]):
-                    s += 1
-                else:
-                    break
-            virgule = len(str(self.value) + s)
-            espace = 1
-            while not int(portion_l(diviseur, espace)) // int(dividende):
-                espace += 1
-                if espace - 1 == len(diviseur):
-                    diviseur += "0"
-            quotient += str(int(portion_l(diviseur, espace)) // int(dividende))
-            reste = dividende * quotient 
+        # # attempt at euclidian division
+
+        # if type(other) == decimal:
+        #     diviseur = str(other.value) + other.decimal
+        #     dividende = str(self.value) + self.decimal
+        #     quotient = ""
+        #     s = 0 #pour savoir où la virgule sera
+        #     for i in range(len(self.decimal)):
+        #         if not int(self.decimal[i]):
+        #             s += 1
+        #         else:
+        #             break
+        #     virgule = len(str(self.value) + s)
+        #     espace = 1
+        #     while not int(portion_l(diviseur, espace)) // int(dividende):
+        #         espace += 1
+        #         if espace - 1 == len(diviseur):
+        #             diviseur += "0"
+        #     quotient += str(int(portion_l(diviseur, espace)) // int(dividende))
+        #     apparitions = []
+        #     do = True
+        #     while (reste) or (reste not in apparitions):
+        #         if do:
+        #             reste = dividende * quotient
+        #             apparitions.append(reste)
+        #             do = False
+
+        # # more conveniant method, but that uses floats
+
+        temp: float = 1 / float(str(other))
+        return self * decimal(temp)
 
 
 def pop_first_str(string: str):
@@ -178,5 +191,3 @@ def portion_l(string: str, n: int) -> str:
         s += temp[0]
         string = temp[1]
     return s
-
-print(decimal(2,4) / decimal(1,36))
