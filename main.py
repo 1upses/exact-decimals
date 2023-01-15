@@ -132,6 +132,9 @@ class decimal:
                 resultat = temp[1]
                 if len(resultat) == 1: #on place des 0 au début du string pour éviter un out of range
                     resultat = "0" + resultat
+
+            if float(str(self)) < 0 * float(str(other)) < 0:
+                return decimal(-int(resultat), to_add)
             return decimal(int(resultat), to_add)
 
         if type(other) == float:
